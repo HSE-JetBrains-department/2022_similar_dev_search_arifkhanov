@@ -41,6 +41,5 @@
 	<p>6.2. ...
 
 ### Литература
-* [Курочка-Ряба](https://github.com/Sm1Ling/Ryaba)
 * [ML4Code](https://ml4code.github.io/)
 * [Awesome Machine Learning on Source Code](https://github.com/src-d/awesome-machine-learning-on-source-code)
