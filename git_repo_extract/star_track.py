@@ -1,5 +1,5 @@
 import time
-from typing import Dict, Any, List
+from typing import Any,Dict, List
 
 from calendar import calendar
 from collections import Counter
@@ -52,7 +52,7 @@ def sleep_until_unblock(account: Github) -> None:
     :return: None
     """
     search_rate_limit = account.get_rate_limit().search
-    print('search remaining: {}'.format(search_rate_limit.remaining))
+    print("search remaining: {}".format(search_rate_limit.remaining))
     reset_timestamp = calendar.timegm(search_rate_limit.reset.timetuple())
     # add 10 seconds to be sure the rate limit has been reset
     sleep_time = max(0.01, reset_timestamp - calendar.timegm(time.gmtime()) + 10)

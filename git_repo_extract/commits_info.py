@@ -1,4 +1,4 @@
-from typing import Dict, Any, Tuple, Iterator
+from typing import Any,Dict, Iterator, Tuple
 
 import json
 import difflib
