@@ -1,16 +1,15 @@
 import time
+from typing import Dict, Any, List
+
 from calendar import calendar
 from collections import Counter
+from github import Github
 from tqdm import tqdm
-from commits_info import write_down_content
-
-from github import Github, RateLimitExceededException
-from typing import Dict, Any, List
 
 
 def get_stargazer_info(repo_name: str, github_key: str,
                        max_user_stars: int = 300,
-                       per_page: int = 80) -> Any[List[Dict], Dict]:
+                       per_page: int = 100) -> Any[List[Dict], Dict]:
     """
     Method investigates stargazers of given repository and return the most popular
     repositories amongst them.

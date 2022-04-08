@@ -1,9 +1,9 @@
-import json
+from typing import Dict, Any, Tuple, Iterator
 
+import json
+import difflib
 from dulwich.diff_tree import TreeChange
 from dulwich.repo import Repo
-import difflib
-from typing import Dict, List, Union, Optional, Any, Tuple, Iterator
 
 
 def get_diffs_num(repos: Repo, sha1: bytes, sha2: bytes) -> Tuple[int, int]:
@@ -14,7 +14,7 @@ def get_diffs_num(repos: Repo, sha1: bytes, sha2: bytes) -> Tuple[int, int]:
         :param sha1: old blob's sha
         :param sha2: new blob's sha
     Returns:
-        :return [Added, Deleted]
+        :return (Added, Deleted)
     """
 
     differences = difflib.unified_diff(repos.get_object(sha1).data.decode().splitlines(),
@@ -55,8 +55,8 @@ def get_commits_info_floored(repo: Repo, limit: int = -1) -> Iterator[Dict[str, 
     i = 0
     for walk in repo.get_walker():
         name = walk.commit.author.decode()
-        mail = name[name.find('<') + 1:-1]
-        name = name[:name.find('<')].strip()
+        mail = name[name.find("<") + 1:-1]
+        name = name[:name.find(">")].strip()
 
         for changes in walk.changes():
             if not isinstance(changes, list):
@@ -65,7 +65,7 @@ def get_commits_info_floored(repo: Repo, limit: int = -1) -> Iterator[Dict[str, 
             for change in changes:
                 try:
                     content = process_change(change, repo)
-                except:
+                except RuntimeError:
                     continue
                 content["repo_url"] = repo_url
                 content["name"] = name
