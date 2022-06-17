@@ -1,7 +1,0 @@
-azure-iothub-device-client
-smbus2
-requests
-luma.oled
-RPi.GPIO
-pyaudio
-pocketsphinx

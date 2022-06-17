@@ -1,7 +1,7 @@
-enthought/apptools
-HPInc/ml-git
 sbg/sevenbridges-python
 dominodatalab/python-domino
+enthought/apptools
+HPInc/ml-git
 mapsme/osm_conflate
 microsoft/vi-hds
 SimpleFinance/pipewelder
