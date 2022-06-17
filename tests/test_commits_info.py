@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pytest
 
-from source_code.git_repo_extract.SavedLanguagesHolder import SavedLanguagesHolder
 from source_code.git_repo_extract.commits_info import define_file_language, get_diffs_num
 
 
@@ -20,7 +19,7 @@ def get_code(path: Path):
                           ])
 def test_define_file_language(file_name: Path, result: str):
     code = get_code(file_name)
-    language_holder = SavedLanguagesHolder()
+    language_holder = dict()
 
     language = define_file_language(str(file_name), code, language_holder)
     second_try = define_file_language(str(file_name), code, language_holder)

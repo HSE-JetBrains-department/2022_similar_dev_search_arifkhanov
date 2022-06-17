@@ -3,7 +3,7 @@ from typing import List, Set
 
 import pytest
 
-from source_code.code_parsing.RepoParser import RepoParser
+from source_code.code_parsing.repo_parser import RepoParser
 from source_code.git_repo_extract.repo_ops import try_find_repo
 
 

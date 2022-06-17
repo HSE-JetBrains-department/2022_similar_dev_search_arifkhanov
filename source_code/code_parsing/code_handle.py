@@ -1,10 +1,10 @@
-from typing import Dict, List, Iterable
+from typing import Dict, Iterable, List
 
 from dulwich.repo import Repo
-from joblib import parallel_backend, Parallel, delayed
+from joblib import delayed, parallel_backend, Parallel
 from tqdm import tqdm
 
-from .RepoParser import RepoParser
+from .repo_parser import RepoParser
 from source_code.git_repo_extract.repo_ops import operate_temporary_repo
 
 
@@ -14,6 +14,7 @@ def parallelize_extraction(temp_repo_path: str,
                            commits_limit: int):
     """
     Method decomposes extract_from_json function
+
     :param commits_limit: maximum number of commits that should be parsed inside of repo
     :param temp_repo_path: path to folder, where temporaryDirectories for repositories should be created
     :param parsed_lines: lines of different repos commit_info data
@@ -36,6 +37,7 @@ def extract_repo_variables_imports(repo: Repo,
                                    commits_limit: int = 1000):
     """
     Method that parses given repository and gets variables and imports data for given commit_infos
+
     :param commits_limit: maximum number of commits that should be parsed inside of repo
     :param supported_languages: list of programming languages that should be parsed
     :param repo: repo object to being parsed

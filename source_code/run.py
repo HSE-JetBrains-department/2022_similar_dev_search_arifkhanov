@@ -1,14 +1,10 @@
-import json
-from pathlib import Path
-from typing import List, Tuple
-
 import click
 
 from git_repo_extract.commits_info import get_commits_info_floored
 from git_repo_extract.star_track import get_stargazer_info, get_top_repos
 from git_repo_extract.repo_ops import operate_temporary_repo
 from code_parsing.code_handle import parallelize_extraction
-from utils import file_writer, parallel_function, split_into_batches, write_down_content
+from utils import *
 
 
 @click.group()
@@ -20,9 +16,9 @@ def cli():
 
 
 @cli.command()
-@click.option("--repos_file_path", default=Path.cwd().parent / "cloned_repos" / "selected_repos.txt", type=click.Path())
-@click.option("--temp_repo_path", default=Path.cwd().parent / "cloned_repos" / "temp_repos", type=click.Path())
-@click.option("--commits_info_path", default=Path.cwd().parent / "cloned_repos" / "commits_info.txt", type=click.Path())
+@click.option("--repos_file_path", default=SELECTED_REPOS_FILE, type=click.Path())
+@click.option("--temp_repo_path", default=TEMP_REPOS_FOLDER, type=click.Path())
+@click.option("--commits_info_path", default=COMMITS_INFO_FILE, type=click.Path())
 @click.option("--batch_size", default=10, type=int)
 @click.option("--start_batch", default=0, type=int)
 @click.option("--commits_number", default=100, type=int)
@@ -68,7 +64,7 @@ def write_repo_commits(repos_file_path: Path,
 
 @cli.command()
 @click.argument("github_key", type=str)
-@click.option("--path", default=Path.cwd().parent / "cloned_repos" / "selected_repos.txt", type=click.Path())
+@click.option("--path", default=SELECTED_REPOS_FILE, type=click.Path())
 @click.option("--url", default="scikit-learn/scikit-learn", type=str)
 @click.option("--limit_stargazers", default=1000, type=int)
 def write_stargazers_repos(github_key: str, path: Path, url: str, limit_stargazers: int) -> None:
@@ -86,9 +82,9 @@ def write_stargazers_repos(github_key: str, path: Path, url: str, limit_stargaze
 
 
 @cli.command()
-@click.option("--json_path", default=Path.cwd().parent / "cloned_repos" / "commits_info.txt", type=click.Path())
-@click.option("--var_imp_path", default=Path.cwd().parent / "cloned_repos" / "variables_imports.txt", type=click.Path())
-@click.option("--temp_repo_path", default=Path.cwd().parent / "cloned_repos" / "temp_repos", type=click.Path())
+@click.option("--json_path", default=COMMITS_INFO_FILE, type=click.Path())
+@click.option("--var_imp_path", default=VARIABLES_IMPORTS_FILE, type=click.Path())
+@click.option("--temp_repo_path", default=TEMP_REPOS_FOLDER, type=click.Path())
 @click.option("--supported_languages", default=["python", "java", "javascript"], multiple=True)
 def write_imports_variables(json_path: Path, var_imp_path: Path, temp_repo_path: Path, supported_languages: List[str]):
     """

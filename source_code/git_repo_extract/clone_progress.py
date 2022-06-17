@@ -7,7 +7,7 @@ class CloneProgress(RemoteProgress):
         super().__init__()
         self.pbar = tqdm(desc=progress_name)
 
-    def update(self, op_code, cur_count, max_count=None, message=''):
+    def update(self, op_code, cur_count, max_count=None, message=""):
         self.pbar.total = max_count
         self.pbar.n = cur_count
         self.pbar.refresh()

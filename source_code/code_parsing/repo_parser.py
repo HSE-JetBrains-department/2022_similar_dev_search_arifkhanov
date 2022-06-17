@@ -1,17 +1,16 @@
 import logging
 from collections import Counter
-from pathlib import Path
-from typing import Dict, List, Set, Union
+from typing import Set
 
 from dulwich.diff_tree import TreeChange
 from dulwich.repo import Repo
 from tree_sitter import Language, Parser
 from tqdm import tqdm
 
-from source_code.code_parsing.QueriedLanguage import QueriedLanguage
+from source_code.code_parsing.queried_language import QueriedLanguage
 from source_code.git_repo_extract.commits_info import define_file_language
-from source_code.git_repo_extract.SavedLanguagesHolder import SavedLanguagesHolder
 from source_code.git_repo_extract.repo_ops import get_repos_url, try_find_repo
+from source_code.utils import *
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +24,9 @@ class RepoParser(object):
 
     def __init__(self, repo: Repo,
                  supported_languages: List[str],
-                 path_to_grammars: Path = Path.cwd().parent / "source_code" / "code_parsing" / "tree-sitter_grammars",
-                 path_to_library: Path = Path.cwd().parent / "source_code" / "code_parsing" / "tree-sitter_grammars" / "lang_lib.so",
-                 path_to_queries: Path = Path.cwd().parent / "source_code" / "code_parsing" / "tree-sitter_queries"):
+                 path_to_grammars: Path = TREE_SITTER_GRAMMARS_FOLDER,
+                 path_to_library: Path = TREE_SITTER_GRAMMARS_FOLDER / "lang_lib.so",
+                 path_to_queries: Path = TREE_SITTER_QUERIES_FOLDER):
         """
         Creates class that will parse a repository and extract imports and variable names for files in it
 
@@ -43,10 +42,10 @@ class RepoParser(object):
         self.used_files: Dict[str, Dict[str, Set]] = {}  # saves  { filepath : { "imports": set(), "variables": set()} }
         self.repo_url = get_repos_url(self.repo)
         self.supported_languages = set([x.strip().lower() for x in supported_languages])
-        self.languages_holder = SavedLanguagesHolder()
+        self.languages_holder = dict()
 
-        tuple(try_find_repo(str(path_to_grammars), f"tree-sitter/tree-sitter-{lang}", True)
-              for lang in supported_languages)  # download repos if not exist
+        for lang in supported_languages:  # download repos if not exist
+            try_find_repo(str(path_to_grammars), f"tree-sitter/tree-sitter-{lang}", True)
 
         Language.build_library(
             str(path_to_library),

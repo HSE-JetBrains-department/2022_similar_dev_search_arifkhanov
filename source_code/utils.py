@@ -5,6 +5,19 @@ from typing import Union, Dict, List, TextIO, Callable
 
 from joblib import Parallel, delayed
 
+current_dir = Path(__file__)
+
+PROJECT_DIRECTORY = [p for p in current_dir.parents if p.parts[-1] == 'source_code'][0].parent
+CLONED_REPOS_FOLDER = PROJECT_DIRECTORY / "cloned_repos"
+SELECTED_REPOS_FILE = CLONED_REPOS_FOLDER / "selected_repos.txt"
+TEMP_REPOS_FOLDER = CLONED_REPOS_FOLDER / "temp_repos"
+COMMITS_INFO_FILE = CLONED_REPOS_FOLDER / "commits_info.txt"
+VARIABLES_IMPORTS_FILE = CLONED_REPOS_FOLDER / "variables_imports.txt"
+SOURCE_CODE_FOLDER = PROJECT_DIRECTORY / "source_code"
+ENRY_PATH = SOURCE_CODE_FOLDER / "enry" / "enry.exe"
+TREE_SITTER_QUERIES_FOLDER = SOURCE_CODE_FOLDER / "code_parsing" / "tree-sitter_queries"
+TREE_SITTER_GRAMMARS_FOLDER = SOURCE_CODE_FOLDER / "code_parsing" / "tree-sitter_grammars"
+
 
 def update_dictionary(dictionary, key, value):
     """
@@ -76,11 +89,3 @@ def write_down_content(content: Union[Dict, str, List], f: TextIO) -> None:
     """
     f.write(json.dumps(content))
     f.write("\n")
-
-
-def get_enry_path() -> Path:
-    """
-    Get enry.exe file path
-    :return: enry Path object
-    """
-    return Path.cwd().parent / "source_code" / "enry" / "enry.exe"

@@ -11,13 +11,11 @@ from dulwich.diff_tree import TreeChange
 from dulwich.repo import Repo
 from tqdm import tqdm
 
-from source_code.git_repo_extract.SavedLanguagesHolder import SavedLanguagesHolder
 from source_code.git_repo_extract.repo_ops import get_repos_url
-from source_code.utils import get_enry_path
+from source_code.utils import ENRY_PATH
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler(sys.stdout))
-
 
 
 def get_commits_info_floored(repo: Repo, limit: int = -1) -> Iterator[Dict[str, Any]]:
@@ -44,7 +42,7 @@ def get_commits_info_floored(repo: Repo, limit: int = -1) -> Iterator[Dict[str, 
       Returns:
         :return Iterator of dicts
     """
-    languages_holder = SavedLanguagesHolder()
+    languages_holder = dict()
     repo_url = get_repos_url(repo)
     i = 0
     for walk in tqdm(repo.get_walker(), desc=f"{repo_url} processing"):
@@ -81,11 +79,10 @@ def get_commits_info_floored(repo: Repo, limit: int = -1) -> Iterator[Dict[str, 
 def get_diffs_num(old_content: str, new_content: str) -> Tuple[int, int]:
     """
     A method that gives blob differences
-    Args:
-        :param old_content: content of old version of blob
-        :param new_content: content of new version
-    Returns:
-        :return (Added, Deleted)
+
+    :param old_content: content of old version of blob
+    :param new_content: content of new version
+    :return (Added, Deleted)
     """
     old_content = old_content.splitlines()
     new_content = new_content.splitlines()
@@ -104,20 +101,18 @@ def get_diffs_num(old_content: str, new_content: str) -> Tuple[int, int]:
 
 def process_change(ch: TreeChange,
                    repo: Repo,
-                   languages_holder: SavedLanguagesHolder,
+                   languages_holder: Dict,
                    max_line_restriction: int = -1) -> [Dict, None]:
     """
     Method for parsing blob change info into dict
 
-    Arguments
-        :param ch: entry of a Repo walker
-        :param repo: source Repo
-        :param languages_holder: accumulates information about repository files languages
-        :param max_line_restriction: file analysis will be skipped if there added more than 'max_line_restriction'
+    :param ch: entry of a Repo walker
+    :param repo: source Repo
+    :param languages_holder: accumulates information about repository files languages
+    :param max_line_restriction: file analysis will be skipped if there added more than 'max_line_restriction'
             lines and None value will be returned. Negative value will make all files be counted
-    Returns
-        :return: dictionary with necessary elements or None if filetype doesn't suits language analysis
-            or its added too many lines
+    :return: dictionary with necessary elements or None if filetype doesn't suits language analysis
+              or its added too many lines
     """
     if ch.new.sha is None:
         return None
@@ -150,7 +145,7 @@ def process_change(ch: TreeChange,
     return content
 
 
-def define_file_language(file_name: str, file_content: str, languages_holder: SavedLanguagesHolder) -> Union[str, None]:
+def define_file_language(file_name: str, file_content: str, languages_holder: Dict) -> Union[str, None]:
     """
     Checks file on file_name and its content with Enry and returns its Programming language
 
@@ -159,7 +154,7 @@ def define_file_language(file_name: str, file_content: str, languages_holder: Sa
     :param languages_holder: holder for already investigated files
     :return: str: language of file,  None: if file cannot be defined by language
     """
-    lang = languages_holder.get_file_info(file_name)
+    lang = languages_holder.get(file_name, None)
     if lang is not None:
         return lang
 
@@ -173,15 +168,16 @@ def define_file_language(file_name: str, file_content: str, languages_holder: Sa
     return entity["language"].lower()
 
 
-def eliminate_language(file_path: str, file_content: str) -> Dict:
+def eliminate_language(file_path: str, file_content: Union[str, bytes]) -> Dict:
     """
     Creates file with given content on given path. Extracts file language and deletes file
+
     :param file_path: Path for file creation
     :param file_content: Inner file data
     :return: File Language
     """
     file_name = file_path.split("/")[-1]
-    path = get_enry_path()
+    path = ENRY_PATH
 
     splitted_f_name = file_name.split(".")
     file_suffix = ""
@@ -194,7 +190,10 @@ def eliminate_language(file_path: str, file_content: str) -> Dict:
                                      dir=str(path.parent),
                                      delete=False) as fp:
         try:
-            fp.write(file_content)
+            if isinstance(file_content, str):
+                fp.write(bytes(file_content, encoding="utf-8"))
+            else:
+                fp.write(file_content)
             fp.close()
 
             value = subprocess.run([str(path), "-json", fp.name], capture_output=True, text=True).stdout
