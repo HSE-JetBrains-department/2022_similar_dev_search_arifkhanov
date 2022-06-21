@@ -11,10 +11,12 @@ from source_code.git_repo_extract.repo_ops import operate_temporary_repo
 def parallelize_extraction(temp_repo_path: str,
                            parsed_lines: Iterable,
                            supported_languages: List[str],
-                           commits_limit: int):
+                           commits_limit: int,
+                           n_jobs: int = -1):
     """
     Method decomposes extract_from_json function
 
+    :param n_jobs: number of processes to parse
     :param commits_limit: maximum number of commits that should be parsed inside of repo
     :param temp_repo_path: path to folder, where temporaryDirectories for repositories should be created
     :param parsed_lines: lines of different repos commit_info data
@@ -22,7 +24,7 @@ def parallelize_extraction(temp_repo_path: str,
     :return:
     """
     with parallel_backend(backend="multiprocessing"):
-        parallel = Parallel(n_jobs=1, verbose=100)
+        parallel = Parallel(n_jobs=n_jobs, verbose=100)
         funcs = (delayed(operate_temporary_repo)(temp_repo_path=temp_repo_path,
                                                  url=line[0]["repo_url"],
                                                  operation=extract_repo_variables_imports,

@@ -22,17 +22,20 @@ def cli():
 @click.option("--batch_size", default=10, type=int)
 @click.option("--start_batch", default=0, type=int)
 @click.option("--commits_number", default=100, type=int)
+@click.option("--n_jobs", default=-1, type=int)
 def write_repo_commits(repos_file_path: Path,
                        temp_repo_path: Path,
                        commits_info_path: Path,
                        batch_size: int,
                        start_batch: int,
-                       commits_number: int) -> None:
+                       commits_number: int,
+                       n_jobs: int) -> None:
     """
     Opens repos_file_path file, gets top repositories from it. Then operates each repository concurrently
     using commits_info.get_commits_info_base.
     Writes all the commits to commits_info_path file
 
+    :param n_jobs: number of processes to operate the task
     :param commits_number: max number of commits should be parsed in each repository
     :param start_batch: number of batch from which to start (useful if previous run failed on this batch)
     :param batch_size: number of repositories should be paralleled before their return values will be written down
@@ -53,6 +56,7 @@ def write_repo_commits(repos_file_path: Path,
 
             result = parallel_function(operate_temporary_repo,  # function
                                        batch,  # source
+                                       n_jobs,  # n_jobs
                                        50,  # verbose
                                        repo_path=str(temp_repo_path),  # kwargs
                                        operation=get_commits_info_floored,
@@ -86,10 +90,16 @@ def write_stargazers_repos(github_key: str, path: Path, url: str, limit_stargaze
 @click.option("--var_imp_path", default=VARIABLES_IMPORTS_FILE, type=click.Path())
 @click.option("--temp_repo_path", default=TEMP_REPOS_FOLDER, type=click.Path())
 @click.option("--supported_languages", default=["python", "java", "javascript"], multiple=True)
-def write_imports_variables(json_path: Path, var_imp_path: Path, temp_repo_path: Path, supported_languages: List[str]):
+@click.option("--n_jobs", default=-1, type=int)
+def write_imports_variables(json_path: Path,
+                            var_imp_path: Path,
+                            temp_repo_path: Path,
+                            supported_languages: List[str],
+                            n_jobs: int):
     """
     Method opens path with commits dataset and parses it in order to get variables
     and imports of each author. It writes them
+    :param n_jobs: how many processes should operate task
     :param var_imp_path: Where to store parsed results
     :param supported_languages: which programming languages should be overviewed
     :param temp_repo_path: path to folder, where temporaryDirectories for repositories should be created
@@ -98,7 +108,7 @@ def write_imports_variables(json_path: Path, var_imp_path: Path, temp_repo_path:
     """
     with json_path.open("r") as rf:
         parsed_lines = (json.loads(line) for line in rf)
-        result = parallelize_extraction(str(temp_repo_path), parsed_lines, supported_languages, 300)
+        result = parallelize_extraction(str(temp_repo_path), parsed_lines, supported_languages, 300, n_jobs)
 
         with var_imp_path.open("a") as af:
             for repo_line_result in result:

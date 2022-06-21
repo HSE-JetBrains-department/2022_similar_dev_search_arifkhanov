@@ -1,6 +1,7 @@
 import logging
 from collections import Counter
-from typing import Set
+from pathlib import Path
+from typing import Dict, List, Set, Union
 
 from dulwich.diff_tree import TreeChange
 from dulwich.repo import Repo
@@ -10,7 +11,7 @@ from tqdm import tqdm
 from source_code.code_parsing.queried_language import QueriedLanguage
 from source_code.git_repo_extract.commits_info import define_file_language
 from source_code.git_repo_extract.repo_ops import get_repos_url, try_find_repo
-from source_code.utils import *
+from source_code.utils import TREE_SITTER_GRAMMARS_FOLDER, TREE_SITTER_QUERIES_FOLDER
 
 logger = logging.getLogger(__name__)
 

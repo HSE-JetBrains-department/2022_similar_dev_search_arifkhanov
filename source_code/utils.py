@@ -44,10 +44,11 @@ def split_into_batches(array: List, batch_size: int) -> List[List]:
             range(math.ceil(len(array) / batch_size))]
 
 
-def parallel_function(function: Callable, source, verbose: int = 50, **kwargs):
+def parallel_function(function: Callable, source, n_jobs: int = -1, verbose: int = 50, **kwargs):
     """
     Flexible way to operate certain function in parallel way
 
+    :param n_jobs: number of processes
     :param function: function to run asynchronously
     :param source: what to iterate asynchronously
     :param verbose: level of joblib parallel verbosity
@@ -60,7 +61,7 @@ def parallel_function(function: Callable, source, verbose: int = 50, **kwargs):
         if value is None:  # finding variable for passing source elements in it
             source_argument = key
 
-    parallel = Parallel(n_jobs=-1, backend="multiprocessing", verbose=verbose)
+    parallel = Parallel(n_jobs=n_jobs, backend="multiprocessing", verbose=verbose)
     funcs = (delayed(function)(**update_dictionary(kwargs.copy(), source_argument, element))
              for element in source if element)
     result = parallel(funcs)
