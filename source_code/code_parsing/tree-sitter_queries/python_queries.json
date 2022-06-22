@@ -1,0 +1,4 @@
+{
+  "imports": "(import_from_statement (dotted_name (identifier)) @dotted_name)\n(import_statement (dotted_name (identifier)) @dotted_name)\n(aliased_import (dotted_name (identifier)) @dotted_name)\n(call function: (identifier) @function.call)",
+  "variables": "(class_definition name: (identifier) @class.name)\n(function_definition name: (identifier) @function.def)\n(expression_statement (assignment left: (identifier) @varialbe.name))\n(expression_statement (augmented_assignment left: (identifier) @variable.name))\n(function_definition parameters: ( parameters (identifier) @argument.name (default_parameter name: (identifier) @argument.name)))"
+}
